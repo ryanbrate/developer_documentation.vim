@@ -1,0 +1,55 @@
+*developer_documentation.vim*
+
+vimscript commands (and supporting functions) to provide a degree of contextually aware documentation lookup. 
+
+:DD                                             *:DD* 
+  get doc for token under cursor, attempting to resolve any aliases
+
+:DD [input]                     
+  get doc for input, attempting to resolve any aliases
+
+:DE [input]                                     *:DE*
+  get doc token under cursor, extenting with input, attemtping to resolve any aliases
+
+
+For each filetype the following must be defined:
+
+    b:DD_conj
+        The character(s) which join namespaces, modules, classes and functions
+        E.g., '.' in python
+
+    b:DD_permissible_chars
+        The character(s) that can belong to a token (for which documentation is to be retreived)
+        E.g., 'a-zA-Z0-9\.'
+
+    b:DD_import_patterns
+        Import patterns from which to extract alias, aliased pairs
+        E.g., [['from\s\s+\(\S\+\)\s\+import\s\+\(\S\+\)as\s\+\(\S\+\)', {3:[1, 2]}], ...]
+        which pulls 'st', 'scipy.stats' from 'from scipy import stats as st'
+
+    b:DD_call 
+        command to call documentation
+        E.g., "!python3 -m pydoc <TOKEN>"
+
+        where <TOKEN> is replaced with the alias-expanded token (token)
+        where <1> is replaced with split(token, b:DD_conj)[0]
+
+E.g., Python
+
+    au FileType python let b:DD_conj = '.'
+    au FileType python let b:DD_permissible_chars = 'a-zA-Z0-9\._'
+    au FileType python let b:DD_import_patterns = [
+        \['from\s\+\(\S\+\)\s\+import\s\+\(\S\+\)\s\+as\s\+\(\S\+\)', {3:[1,2]}],
+        \['from\s\+\(\S\+\)\s\+import\s\+\(\S\+\)', {2:[1, 2]}],
+        \['import\s\+\(\S\+\)\s\+as\s\+\(\S\+\)', {2:[1]}],
+        \]
+    au FileType python let b:DD_call = '!python3 -m pydoc <TOKEN>'
+
+E.g., Julia
+
+    au FileType julia let b:DD_conj = '.'
+    au FileType julia let b:DD_permissible_chars = 'a-zA-Z0-9\._!'
+    au FileType julia let b:DD_import_patterns = [
+        \['using\s\+\(\S\+\)\s*:\s*\(\S\+\)', {2:[1, 2]}],
+        \]
+    au FileType julia let b:DD_call = "!julia -E 'try; using <1>; catch; end; @doc <TOKEN>' | less"
