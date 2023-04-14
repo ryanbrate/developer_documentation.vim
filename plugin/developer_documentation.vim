@@ -32,13 +32,25 @@ function! BufferAliases(import_patterns, conj) abort
 endfunction
 
 function! UnderCursor(permissible_chars) abort
-    " Return the token under cursor.
+
+    " Return the token under the cursor or return 0
     let line_ = getline('.')
     let i = col('.')-1
     let char_ = line_[i]
+
+    " proceed only if the char under cursor is a permissible char
     if match(char_, '['.a:permissible_chars.']') != -1
-        let lhs_cursor = split(line_[:i-1], '[^'.a:permissible_chars.']', 1)[-1]
+
+        " get everything permissible to the lhs of the cursor
+        if i > 0
+            let lhs_cursor = split(line_[:i-1], '[^'.a:permissible_chars.']', 1)[-1]
+        else
+            let lhs_cursor = ''
+        elseif
+
+        " get everything permissible to the rhs of the cursor
         let rhs_cursor = split(line_[i+1:], '[^'.a:permissible_chars.']', 1)[0]
+
         return lhs_cursor.char_.rhs_cursor  
     endif
 endfunction
