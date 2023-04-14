@@ -46,7 +46,7 @@ function! UnderCursor(permissible_chars) abort
             let lhs_cursor = split(line_[:i-1], '[^'.a:permissible_chars.']', 1)[-1]
         else
             let lhs_cursor = ''
-        elseif
+        endif
 
         " get everything permissible to the rhs of the cursor
         let rhs_cursor = split(line_[i+1:], '[^'.a:permissible_chars.']', 1)[0]
