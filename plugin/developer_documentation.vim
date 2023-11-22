@@ -2,11 +2,12 @@
 " Last Change: 13 April 2023
 " By: Ryan Brate
 
-if exists('g:developer_documentation_vim') | finish | endif
+if exists('g:loaded_developer_documentation_vim') | finish | endif
 let g:loaded_developer_documentation_vim = 1
 
 function! CascadeFind(import_patterns, conj, text) abort
-    " Return [alias::str, aliased::str] or empty [] corresponding to text
+    " Return [alias::str, aliased::str] for first pattern that text matches
+    " against or return [] if no patterns match against.
     " Note: reports the first matching pattern only
     for [import_pattern, parts] in a:import_patterns
         let matched_groups = matchlist(a:text, import_pattern)
@@ -70,7 +71,11 @@ function! ExpandAliases(token, conj, aliases) abort
 endfunction
 
 function! DocCommand(token, call_string, conj, extend=0) abort
-    " Return an Ex command (str) for generating documentation 
+    " Return an Ex command (str) for generating documentation wrt., 'token'
+    " Args:
+    "   token (string): token to replace <TOKEN> with in the call_string
+    "   call_string (string): the documentation call 
+    "   conj (string): the string that conjugates modules, classes, functions
 
     " <TOKEN> substitution
     if a:extend!=0
@@ -84,20 +89,17 @@ function! DocCommand(token, call_string, conj, extend=0) abort
         call histadd('cmd', 'DD '.a:token)
     endif
 
-    " <1> substitution
-    let first = split(a:token, escape(a:conj, a:conj))[0]
-    let call_string = substitute(call_string, '<1>', first, '')
     echom call_string
 
     return call_string
 endfunction
 
 command! -nargs=* DD exec len(split(<q-args>))==0 ? 
-            \DocCommand(
+            \DocCommand(  # return Ex command
                 \ExpandAliases(
-                    \UnderCursor(b:DD_permissible_chars), 
-                    \b:DD_conj, 
-                    \BufferAliases(b:DD_import_patterns, b:DD_conj)
+                    \UnderCursor(b:DD_permissible_chars),   # get word under cursor
+                    \b:DD_conj,
+                    \BufferAliases(b:DD_import_patterns, b:DD_conj)  # buffer aliases according to import patterns
                 \), 
                 \b:DD_call, b:DD_conj
             \) 
