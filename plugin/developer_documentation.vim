@@ -127,3 +127,4 @@ command! -nargs=* DE exec DocCommand(
                             \1
                          \)
 
+command! -nargs=* DO exec DocCommand(\<q-args>, \b:DD_call, b:DD_conj)
