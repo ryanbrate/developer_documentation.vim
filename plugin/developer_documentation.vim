@@ -33,6 +33,8 @@ function! BufferAliases(import_patterns, conj) abort
 endfunction
 
 function! UnderCursor(permissible_chars) abort
+    """ Return the character sequence under cursor of only 'permissible_chars'
+    """
 
     " Return the token under the cursor or return 0
     let line_ = getline('.')
@@ -57,7 +59,8 @@ function! UnderCursor(permissible_chars) abort
 endfunction
 
 function! ExpandAliases(token, conj, aliases) abort
-    " Return a:token with the first namespace expanded by any known alias
+    " Return a:token with the first namespace expanded by any known alias in
+    " the buffer
     let token_parts = split(a:token, escape(a:conj, a:conj))
     let namespace = token_parts[0]
     if In(namespace, keys(a:aliases))
