@@ -92,6 +92,10 @@ function! DocCommand(token, call_string, conj, extend=0) abort
         call histadd('cmd', 'DD '.a:token)
     endif
 
+    " <1> substitution
+    let first = split(a:token, escape(a:conj, a:conj))[0]
+    let call_string = substitute(call_string, '<1>', first, '')
+
     echom call_string
 
     return call_string
