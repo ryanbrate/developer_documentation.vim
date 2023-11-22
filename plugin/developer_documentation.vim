@@ -98,11 +98,11 @@ function! DocCommand(token, call_string, conj, extend=0) abort
 endfunction
 
 command! -nargs=* DD exec len(split(<q-args>))==0 ? 
-            \DocCommand(  # return Ex command
+            \DocCommand(
                 \ExpandAliases(
-                    \UnderCursor(b:DD_permissible_chars),   # get word under cursor
+                    \UnderCursor(b:DD_permissible_chars),
                     \b:DD_conj,
-                    \BufferAliases(b:DD_import_patterns, b:DD_conj)  # buffer aliases according to import patterns
+                    \BufferAliases(b:DD_import_patterns, b:DD_conj)
                 \), 
                 \b:DD_call, b:DD_conj
             \) 
