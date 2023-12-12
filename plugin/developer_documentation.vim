@@ -25,10 +25,19 @@ endfunction
 function! BufferAliases(import_patterns, conj) abort
     " Return {alias: aliased, ...} or empty {} corresponding to buffer.
     let buffer_lines = getline(line('^'), line('$'))
+
+    # get alias:aliased according to import_patterns
     let aliases = {}
     for [alias, aliased] in Filter({i-> len(i) > 0}, Map(function("CascadeFind", [a:import_patterns, a:conj]), buffer_lines))
         let aliases[alias] = aliased 
     endfor
+
+    " Expand any aliases present in the aliased, 
+    " e.g., python type hints using aliased
+    for [alias, aliased] in items(aliases)
+        let aliases[alias] = ExpandAliases(aliased, a:conj, aliases)
+    endfor
+
     return aliases
 endfunction
 
