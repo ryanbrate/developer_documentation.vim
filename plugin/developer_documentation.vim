@@ -9,18 +9,19 @@ function! CascadeFind(import_patterns, conj, text) abort
     " Return [alias::str, aliased::str] for first pattern that text matches
     " against or return [] if no patterns match against.
     " Note: reports the first matching pattern only
+    let returned = []
     for [import_pattern, parts] in a:import_patterns
         let matched_groups = matchlist(a:text, import_pattern)
         if len(matched_groups) > 0
             for [k, v] in items(parts)
                 let alias = matched_groups[k]
                 let aliased = join(Map({i->matched_groups[i]}, v), a:conj)
+                call add(returned, [alias, aliased])
             endfor 
-            echom(["DD CascadeFind", alias, aliased])
-            return [alias, aliased]
         endif
     endfor
-    return []
+    echom([a:text, returned])
+    return returned
 endfunction
 
 function! BufferAliases(import_patterns, conj) abort
@@ -29,8 +30,10 @@ function! BufferAliases(import_patterns, conj) abort
 
     " get alias:aliased according to import_patterns
     let aliases = {}
-    for [alias, aliased] in Filter({i-> len(i) > 0}, Map(function("CascadeFind", [a:import_patterns, a:conj]), buffer_lines))
-        let aliases[alias] = aliased 
+    for buffer_line in buffer_lines
+        for [alias, aliased] in CascadeFind(a:import_patterns, a:conf, buffer_line) 
+            let aliases[alias] = aliased
+        endfor
     endfor
 
     return aliases
