@@ -31,7 +31,7 @@ function! BufferAliases(import_patterns, conj) abort
     " get alias:aliased according to import_patterns
     let aliases = {}
     for buffer_line in buffer_lines
-        for [alias, aliased] in CascadeFind(a:import_patterns, a:conf, buffer_line) 
+        for [alias, aliased] in CascadeFind(a:import_patterns, a:conj, buffer_line) 
             let aliases[alias] = aliased
         endfor
     endfor
