@@ -20,7 +20,9 @@ function! CascadeFind(import_patterns, conj, text) abort
             endfor 
         endif
     endfor
-    echom([a:text, returned])
+    if len(returned)>0
+        echom([a:text, returned])
+    endif
     return returned
 endfunction
 
