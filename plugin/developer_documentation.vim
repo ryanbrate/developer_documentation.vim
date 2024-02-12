@@ -16,6 +16,7 @@ function! CascadeFind(import_patterns, conj, text) abort
                 let alias = matched_groups[k]
                 let aliased = join(Map({i->matched_groups[i]}, v), a:conj)
             endfor 
+            echom(["DD CascadeFind", alias, aliased])
             return [alias, aliased]
         endif
     endfor
