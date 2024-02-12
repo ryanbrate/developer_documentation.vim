@@ -32,12 +32,6 @@ function! BufferAliases(import_patterns, conj) abort
         let aliases[alias] = aliased 
     endfor
 
-    " Expand any aliases present in the aliased, 
-    " e.g., python type hints using aliased
-    for [alias, aliased] in items(aliases)
-        let aliases[alias] = ExpandAliases(aliased, a:conj, aliases)
-    endfor
-
     return aliases
 endfunction
 
