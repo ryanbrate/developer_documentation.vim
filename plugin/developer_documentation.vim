@@ -99,8 +99,6 @@ function! DocCommand(token, call_string, conj, extend=0) abort
         call histadd('cmd', 'DD '.a:token)
     endif
 
-    echom call_string
-
     return call_string
 endfunction
 
