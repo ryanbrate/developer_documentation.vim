@@ -18,11 +18,11 @@ function! CascadeFind(import_patterns, conj, text) abort
                 let aliased = join(Map({i->matched_groups[i]}, v), a:conj)
                 call add(returned, [alias, aliased])
             endfor 
+            echom([a:text, returned])
+            return returned
         endif
     endfor
-    if len(returned)>0
-        echom([a:text, returned])
-    endif
+    echom([a:text, returned])
     return returned
 endfunction
 
