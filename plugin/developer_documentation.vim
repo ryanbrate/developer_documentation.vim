@@ -6,17 +6,17 @@ if exists('g:loaded_developer_documentation_vim') | finish | endif
 let g:loaded_developer_documentation_vim = 1
 
 function! CascadeFind(import_patterns, conj, text) abort
-    " Return [alias::str, aliased::str] for first pattern that text matches
+    " Return [alias::str, aliased::str, recursive::int] for first pattern that text matches
     " against or return [] if no patterns match against.
     " Note: reports the first matching pattern only
     let returned = []
-    for [import_pattern, parts] in a:import_patterns
+    for [import_pattern, parts, recursive] in a:import_patterns
         let matched_groups = matchlist(a:text, import_pattern)
         if len(matched_groups) > 0
             for [k, v] in items(parts)
                 let alias = matched_groups[k]
                 let aliased = join(Map({i->matched_groups[i]}, v), a:conj)
-                call add(returned, [alias, aliased])
+                call add(returned, [alias, aliased, recursive])
             endfor 
             return returned
         endif
@@ -31,8 +31,13 @@ function! BufferAliases(import_patterns, conj) abort
     " get alias:aliased according to import_patterns
     let aliases = {}
     for buffer_line in buffer_lines
-        for [alias, aliased] in CascadeFind(a:import_patterns, a:conj, buffer_line) 
-            let aliases[alias] = aliased
+        for [alias, aliased, recursive] in CascadeFind(a:import_patterns, a:conj, buffer_line) 
+            if recursive == 1 
+                " i.e., a type hint, where the aliased may need expansion
+                let aliases[alias] = ExpandAliases(aliased, a:conj, aliases)
+            else
+                let aliases[alias] = aliased
+            endif
         endfor
     endfor
 
@@ -130,6 +135,10 @@ command! -nargs=* DE exec DocCommand(
                             \b:DD_call, 
                             \b:DD_conj, 
                             \1
-                         \)
+                        \)
 
-command! -nargs=* DO exec DocCommand(<q-args>, b:DD_call, b:DD_conj)
+
+command! -nargs=* DO exec len(split(<q-args>))==0 ? 
+            \DocCommand(UnderCursor(b:DD_permissible_chars), b:DD_call, b:DD_conj) 
+            \: 
+            \DocCommand(<q-args>, b:DD_call, b:DD_conj)
